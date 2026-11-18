@@ -27,30 +27,31 @@
       "id": "pdip",
       "judul": "PDI Perjuangan",
       "deskripsi": "Pemberitaan PDI Perjuangan / PDIP.",
-      "kueri": [
-        "\"PDI Perjuangan\"",
-        "PDIP"
-      ]
+      "kueri": ["\"PDI Perjuangan\"", "PDIP"]
     },
     {
       "id": "megawati",
       "judul": "Megawati Soekarnoputri",
       "deskripsi": "Megawati Soekarnoputri, Ketum PDIP / Ketum PDI Perjuangan.",
-      "kueri": [
-        "\"Megawati Soekarnoputri\"",
-        "\"Ketum PDIP\"",
-        "\"Ketum PDI Perjuangan\"",
-        "Megawati PDIP"
-      ]
+      "kueri": ["\"Megawati Soekarnoputri\"", "\"Ketum PDIP\"", "\"Ketum PDI Perjuangan\"", "Megawati PDIP"]
     },
     {
       "id": "puan",
       "judul": "Puan Maharani",
       "deskripsi": "Puan Maharani, Ketua DPR RI.",
-      "kueri": [
-        "\"Puan Maharani\"",
-        "\"Ketua DPR\" Puan"
-      ]
+      "kueri": ["\"Puan Maharani\"", "\"Ketua DPR\" Puan"]
+    },
+    {
+      "id": "pinka",
+      "judul": "Pinka Haprani",
+      "deskripsi": "Diah Pikatan Hapsari / Pinka Haprani.",
+      "kueri": ["\"Diah Pikatan Hapsari\"", "\"Pinka Haprani\"", "\"Anak Puan\""]
+    },
+    {
+      "id": "rio",
+      "judul": "Rio Dondokambey",
+      "deskripsi": "Rio Dondokambey.",
+      "kueri": ["\"Rio Dondokambey\"", "\"Anak Olly Dondokambey\""]
     }
   ]
 }
