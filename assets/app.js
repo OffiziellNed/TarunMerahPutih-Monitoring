@@ -371,4 +371,186 @@
         .sort((a, b) => (a.status === "Selesai") - (b.status === "Selesai") || (prio[a.prioritas] ?? 3) - (prio[b.prioritas] ?? 3) || b.tanggal.localeCompare(a.tanggal));
       $("#ciGrid").innerHTML = f.length ? f.map((x) => `
         <a class="card ci-card prio-${esc(x.prioritas)}" href="#/counter-issue/${encodeURIComponent(x.id)}">
-          <div
+          <div class="top"><span class="badge st-${esc(x.status)}">${esc(x.status)}</span><span class="badge b-line">Prioritas ${esc(x.prioritas)}</span>${x.kategori ? `<span class="badge b-red">${esc(x.kategori)}</span>` : ""}</div>
+          <h3>${esc(x.judul)}</h3>
+          <p>${esc(x.ringkasan)}</p>
+          <div class="foot"><span>${ico("cal")} ${tglPanjang(x.tanggal)}</span><span class="link">Buka ${ico("arrow")}</span></div>
+        </a>`).join("") : `<div class="card" style="grid-column:1/-1">${empty("Tidak ada isu yang cocok.")}</div>`;
+    };
+    $("#ciQ").addEventListener("input", (e) => { stCI.q = e.target.value; render(); });
+    $("#ciSt").addEventListener("click", (e) => {
+      const b = e.target.closest("button"); if (!b) return;
+      stCI.status = b.dataset.s; $$("#ciSt button").forEach((x) => x.classList.toggle("on", x === b)); render();
+    });
+    render();
+  }
+
+  async function viewCounterDetail(id) {
+    view.innerHTML = `<div class="skel" style="height:200px;border-radius:16px"></div>`;
+    let list;
+    try { list = await loadData("counter-issue"); } catch (e) { view.innerHTML = empty(e.message, "alert"); return; }
+    const x = list.find((i) => i.id === id);
+    if (!x) { view.innerHTML = `<a class="back" href="#/counter-issue">${ico("back")}Kembali</a><div class="card">${empty("Isu tidak ditemukan.", "alert")}</div>`; return; }
+    const poin = x.poin_kunci || [];
+    view.innerHTML = `
+      <a class="back" href="#/counter-issue">${ico("back")}Semua Counter Issue</a>
+      <div class="detail fade-in">
+        <div>
+          <div class="card detail-head">
+            <div class="top"><span class="badge st-${esc(x.status)}">${esc(x.status)}</span><span class="badge b-line">Prioritas ${esc(x.prioritas)}</span>${x.kategori ? `<span class="badge b-red">${esc(x.kategori)}</span>` : ""}</div>
+            <h1>${esc(x.judul)}</h1>
+            <p class="lead">${esc(x.ringkasan)}</p>
+          </div>
+          <div class="card section">
+            <div class="section-title"><span class="ic">${ico("alert")}</span><h2>Isu yang Beredar</h2></div>
+            <div class="prose">${md(x.narasi_isu)}</div>
+          </div>
+          <div class="card section">
+            <div class="section-title"><span class="ic ok">${ico("shield")}</span><h2>Kontra-Narasi</h2></div>
+            <div class="prose">${md(x.kontra_narasi)}</div>
+          </div>
+          ${poin.length ? `
+          <div class="card section">
+            <div class="row-between" style="margin-bottom:14px">
+              <div class="section-title" style="margin:0"><span class="ic">${ico("mic")}</span><h2>Poin Kunci</h2></div>
+              <button class="btn" id="copyAll">${ico("copy")}Salin semua</button>
+            </div>
+            <div class="keypoints">${poin.map((p, i) => `<div class="kp"><p>${esc(p)}</p><button class="icon-btn" data-cp="${i}" aria-label="Salin">${ico("copy")}</button></div>`).join("")}</div>
+          </div>` : ""}
+        </div>
+        <aside>
+          <div class="card side-card">
+            <dl>
+              <div><dt>Tanggal</dt><dd>${tglPanjang(x.tanggal)}</dd></div>
+              ${x.platform && x.platform.length ? `<div><dt>Platform</dt><dd><div class="chips" style="margin-top:4px">${x.platform.map((p) => `<span class="chip">${esc(p)}</span>`).join("")}</div></dd></div>` : ""}
+              ${x.juru_bicara && x.juru_bicara.length ? `<div><dt>Juru Bicara</dt><dd>${x.juru_bicara.map(esc).join("<br>")}</dd></div>` : ""}
+              ${x.tags && x.tags.length ? `<div><dt>Tag</dt><dd><div class="chips" style="margin-top:4px">${x.tags.map((p) => `<span class="chip">#${esc(p)}</span>`).join("")}</div></dd></div>` : ""}
+            </dl>
+          </div>
+          ${x.referensi && x.referensi.length ? `<div class="card side-card"><h3 style="margin-bottom:12px">Referensi</h3><div class="refs">${x.referensi.map((r) => `<a href="${esc(safeUrl(r.url))}" target="_blank" rel="noopener">${ico("link")}<span>${esc(r.judul || r.url)}</span></a>`).join("")}</div></div>` : ""}
+        </aside>
+      </div>`;
+    $$("[data-cp]").forEach((b) => b.addEventListener("click", () => salin(poin[+b.dataset.cp])));
+    const ca = $("#copyAll");
+    if (ca) ca.addEventListener("click", () => salin(poin.map((p, i) => `${i + 1}. ${p}`).join("\n")));
+  }
+
+  // =====================================================================
+  //  VIEW: PRESTASI KERJA
+  // =====================================================================
+  const stPK = { q: "", bidang: "semua" };
+  const cover = (x, badge = true) => `
+    <div class="cover">
+      ${x.sampul ? `<img class="photo" src="${esc(safeUrl(x.sampul))}" alt="" loading="lazy" />` : `<img class="ph" src="/assets/emblem.png" alt="" />`}
+      ${badge && x.bidang ? `<span class="badge b-ink bd">${esc(x.bidang)}</span>` : ""}
+    </div>`;
+
+  async function viewPrestasiList() {
+    view.innerHTML = `
+      <div class="page-head fade-in">
+        <div><div class="eyebrow">Capaian Organisasi</div><h1>Prestasi Kerja</h1><p class="sub">Program dan kegiatan yang sudah dijalankan pengurus. Klik kartu untuk membuka detail.</p></div>
+      </div>
+      <div class="toolbar">
+        <label class="search">${ico("search")}<input class="input" id="pkQ" placeholder="Cari program, pelaksana, lokasi…" value="${esc(stPK.q)}" /></label>
+        <select class="select" id="pkB"><option value="semua">Semua bidang</option></select>
+      </div>
+      <div class="grid g-3" id="pkGrid">${Array.from({ length: 3 }, () => `<div class="card"><div class="skel" style="height:260px"></div></div>`).join("")}</div>`;
+    let list;
+    try { list = await loadData("prestasi-kerja"); }
+    catch (e) { $("#pkGrid").innerHTML = `<div class="card">${empty(e.message, "alert")}</div>`; return; }
+    const bidang = [...new Set(list.map((x) => x.bidang).filter(Boolean))].sort();
+    $("#pkB").innerHTML += bidang.map((b) => `<option>${esc(b)}</option>`).join("");
+    $("#pkB").value = bidang.includes(stPK.bidang) ? stPK.bidang : "semua";
+    const render = () => {
+      const q = stPK.q.toLowerCase();
+      const f = list
+        .filter((x) => (stPK.bidang === "semua" || x.bidang === stPK.bidang) && (!q || `${x.judul} ${x.ringkasan} ${x.lokasi} ${(x.pelaksana || []).join(" ")}`.toLowerCase().includes(q)))
+        .sort((a, b) => b.tanggal.localeCompare(a.tanggal));
+      $("#pkGrid").innerHTML = f.length ? f.map((x) => `
+        <a class="card pk-card" href="#/prestasi/${encodeURIComponent(x.id)}">
+          ${cover(x)}
+          <div class="pk-body">
+            <h3>${esc(x.judul)}</h3>
+            <p>${esc(x.ringkasan)}</p>
+            <div class="pk-meta"><span>${ico("cal")}${tglPanjang(x.tanggal)}</span>${x.lokasi ? `<span>${ico("pin")}${esc(x.lokasi)}</span>` : ""}</div>
+          </div>
+        </a>`).join("") : `<div class="card" style="grid-column:1/-1">${empty("Tidak ada data yang cocok.")}</div>`;
+    };
+    $("#pkQ").addEventListener("input", (e) => { stPK.q = e.target.value; render(); });
+    $("#pkB").addEventListener("change", (e) => { stPK.bidang = e.target.value; render(); });
+    render();
+  }
+
+  async function viewPrestasiDetail(id) {
+    view.innerHTML = `<div class="skel" style="height:200px;border-radius:16px"></div>`;
+    let list;
+    try { list = await loadData("prestasi-kerja"); } catch (e) { view.innerHTML = empty(e.message, "alert"); return; }
+    const x = list.find((i) => i.id === id);
+    if (!x) { view.innerHTML = `<a class="back" href="#/prestasi">${ico("back")}Kembali</a><div class="card">${empty("Data tidak ditemukan.", "alert")}</div>`; return; }
+    view.innerHTML = `
+      <a class="back" href="#/prestasi">${ico("back")}Semua Prestasi Kerja</a>
+      <div class="detail fade-in">
+        <div>
+          <div class="detail-cover">${cover(x, false)}</div>
+          <div class="card detail-head">
+            <div class="top">${x.bidang ? `<span class="badge b-red">${esc(x.bidang)}</span>` : ""}</div>
+            <h1>${esc(x.judul)}</h1>
+            <p class="lead">${esc(x.ringkasan)}</p>
+          </div>
+          ${x.capaian && x.capaian.length ? `<div class="metrics">${x.capaian.map((c) => `<div class="metric"><div class="v">${esc(c.nilai)}</div><div class="l">${esc(c.label)}</div></div>`).join("")}</div>` : ""}
+          <div class="card section"><div class="prose">${md(x.konten)}</div></div>
+          ${x.galeri && x.galeri.length ? `<div class="card section"><div class="section-title"><span class="ic">${ico("eye")}</span><h2>Galeri</h2></div><div class="gallery">${x.galeri.map((g) => `<a href="${esc(safeUrl(g))}" target="_blank" rel="noopener"><img src="${esc(safeUrl(g))}" alt="" loading="lazy" /></a>`).join("")}</div></div>` : ""}
+        </div>
+        <aside>
+          <div class="card side-card">
+            <dl>
+              <div><dt>Tanggal</dt><dd>${tglPanjang(x.tanggal)}</dd></div>
+              ${x.lokasi ? `<div><dt>Lokasi</dt><dd>${esc(x.lokasi)}</dd></div>` : ""}
+              ${x.pelaksana && x.pelaksana.length ? `<div><dt>Pelaksana</dt><dd>${x.pelaksana.map(esc).join("<br>")}</dd></div>` : ""}
+              ${x.tags && x.tags.length ? `<div><dt>Tag</dt><dd><div class="chips" style="margin-top:4px">${x.tags.map((p) => `<span class="chip">#${esc(p)}</span>`).join("")}</div></dd></div>` : ""}
+            </dl>
+          </div>
+          ${x.liputan && x.liputan.length ? `<div class="card side-card"><h3 style="margin-bottom:12px">Liputan Media</h3><div class="refs">${x.liputan.map((r) => `<a href="${esc(safeUrl(r.url))}" target="_blank" rel="noopener">${ico("link")}<span>${esc(r.judul || r.url)}</span></a>`).join("")}</div></div>` : ""}
+        </aside>
+      </div>`;
+  }
+
+  // =====================================================================
+  //  ROUTER
+  // =====================================================================
+  function setActive(key) {
+    $$("#nav a").forEach((a) => a.classList.toggle("active", a.dataset.nav === key));
+  }
+  function route() {
+    const parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean).map(decodeURIComponent);
+    document.body.classList.remove("nav-open");
+    window.scrollTo(0, 0);
+    const [a, b] = parts;
+    if (a === "berita") { setActive(`berita-${b || "tmp"}`); viewBerita(b || "tmp"); document.title = "Berita – TMP Monitoring"; }
+    else if (a === "counter-issue") { setActive("counter"); b ? viewCounterDetail(b) : viewCounterList(); document.title = "Counter Issue – TMP Monitoring"; }
+    else if (a === "prestasi") { setActive("prestasi"); b ? viewPrestasiDetail(b) : viewPrestasiList(); document.title = "Prestasi Kerja – TMP Monitoring"; }
+    else { setActive("dashboard"); viewDashboard(); document.title = "Taruna Merah Putih – Monitoring"; }
+  }
+  window.addEventListener("hashchange", route);
+
+  // ---------- shell ----------
+  $("#menuBtn").addEventListener("click", () => document.body.classList.toggle("nav-open"));
+  $("#scrim").addEventListener("click", () => document.body.classList.remove("nav-open"));
+  const themeBtn = $("#themeBtn");
+  const paintTheme = () => {
+    const dark = document.documentElement.dataset.theme === "dark";
+    themeBtn.innerHTML = `${ico(dark ? "sun" : "moon")}<span>${dark ? "Mode terang" : "Mode gelap"}</span>`;
+  };
+  themeBtn.addEventListener("click", () => {
+    const dark = document.documentElement.dataset.theme !== "dark";
+    document.documentElement.dataset.theme = dark ? "dark" : "";
+    try { localStorage.setItem("tmp-theme", dark ? "dark" : "light"); } catch {}
+    paintTheme();
+  });
+  paintTheme();
+  const tick = () => ($("#clock").textContent = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB");
+  tick(); setInterval(tick, 30e3);
+  loadData("counter-issue").then((l) => { const n = l.filter((x) => x.status === "Aktif").length; $("#nav-ci").textContent = n || ""; }).catch(() => {});
+
+  route();
+})();
