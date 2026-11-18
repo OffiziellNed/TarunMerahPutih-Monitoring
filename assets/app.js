@@ -175,13 +175,17 @@
     view.innerHTML = `
       <section class="hero fade-in">
         <div>
-          <div class="eyebrow">${esc(tglPanjang(Date.now()))}</div>
+          <div class="eyebrow">${esc(tglPanjang(Date.now()))} · <span id="dJam"></span></div>
           <h1>${sapa}, Tim Monitoring</h1>
-          <p>Jumlah pemberitaan 7 hari terakhir, isu yang perlu dijawab, dan capaian kerja organisasi dalam satu layar.</p>
+          <p>Jumlah pemberitaan <b id="dLabel">${labelRentang(stBerita.jam)}</b> terakhir, isu yang perlu dijawab, dan capaian kerja organisasi dalam satu layar.</p>
         </div>
         <div class="hero-logo"><img src="/assets/logo-tmp.png" alt="Taruna Merah Putih" /></div>
       </section>
 
+      <div class="dash-bar">
+        <div><h2>Pemberitaan</h2><span class="muted" id="dUpd">memuat…</span></div>
+        <div class="seg seg-scroll" id="dHari">${RENTANG.map((r) => `<button data-h="${r.jam}" class="${r.jam === stBerita.jam ? "on" : ""}">${r.label}</button>`).join("")}</div>
+      </div>
       <div class="grid g-3" id="dTopik">
         ${TOPIK.map((t) => `
           <a class="card topic-card" href="#/berita/${t.id}">
@@ -216,7 +220,34 @@
         <div><div class="t">${esc(x.judul)}</div><div class="m">${esc(x.bidang)} · ${tglPendek(x.tanggal)}</div></div></a>`).join("") : empty("Belum ada data");
     }).catch((e) => ($("#dPK").innerHTML = empty(e.message, "alert")));
 
-    const hasil = await Promise.allSettled(TOPIK.map((t) => loadBerita(t.id, 168)));
+    const jamEl = $("#dJam");
+    const tickJam = () => { if (jamEl.isConnected) jamEl.textContent = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB"; };
+    tickJam();
+    clearInterval(viewDashboard._t); viewDashboard._t = setInterval(tickJam, 15e3);
+
+    $("#dHari").addEventListener("click", (e) => {
+      const b = e.target.closest("button"); if (!b) return;
+      stBerita.jam = +b.dataset.h;
+      $$("#dHari button").forEach((x) => x.classList.toggle("on", x === b));
+      $("#dLabel").textContent = labelRentang(stBerita.jam);
+      muatTopikDashboard();
+    });
+    muatTopikDashboard();
+  }
+
+  async function muatTopikDashboard() {
+    const jam = stBerita.jam;
+    TOPIK.forEach((t) => {
+      const num = $(`[data-num="${t.id}"]`), sent = $(`[data-sent="${t.id}"]`);
+      if (!num) return;
+      num.innerHTML = `<span class="skel" style="display:inline-block;width:56px;height:28px"></span>`;
+      sent.innerHTML = `<div class="skel" style="height:8px"></div>`;
+    });
+    $("#dUpd").textContent = "memuat…";
+    const hasil = await Promise.allSettled(TOPIK.map((t) => loadBerita(t.id, jam)));
+    if (jam !== stBerita.jam || !$("#dTopik")) return; // pengguna sudah ganti rentang / pindah halaman
+    const waktu = hasil.filter((h) => h.status === "fulfilled").map((h) => h.value.diperbarui).sort()[0];
+    $("#dUpd").textContent = `${labelRentang(jam)} terakhir${waktu ? ` · diperbarui ${new Date(waktu).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB` : ""}`;
     hasil.forEach((h, i) => {
       const t = TOPIK[i];
       const num = $(`[data-num="${t.id}"]`), sent = $(`[data-sent="${t.id}"]`);
