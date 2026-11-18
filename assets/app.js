@@ -91,13 +91,22 @@
     tip.style.left = x + "px"; tip.style.top = y + "px";
   });
 
-  const sentBadge = (s) => s === "positif" ? `<span class="badge b-pos">Positif</span>` : s === "negatif" ? `<span class="badge b-neg">Negatif</span>` : `<span class="badge b-neu">Netral</span>`;
-  function sbar(s) {
-    const tot = s.positif + s.netral + s.negatif || 1;
-    const seg = (k, c) => s[k] ? `<i class="${c}" style="width:${(s[k] / tot) * 100}%"></i>` : "";
-    return `<div class="sbar">${seg("positif", "p")}${seg("netral", "n")}${seg("negatif", "x")}</div>`;
+  const sentBadge = (s) => s === "negatif" ? `<span class="badge b-neg">Negatif</span>` : `<span class="badge b-pos">Positif</span>`;
+  // persentase positif vs negatif (netral lama ikut dihitung positif)
+  function persen(s) {
+    const pos = (s.positif || 0) + (s.netral || 0), neg = s.negatif || 0, tot = pos + neg;
+    const pp = tot ? Math.round((pos / tot) * 100) : 0;
+    return { pos, neg, tot, pp, pn: tot ? 100 - pp : 0 };
   }
-  const slegend = (s) => `<div class="slegend"><span><i class="dot" style="background:var(--pos)"></i>Positif <b>${s.positif}</b></span><span><i class="dot" style="background:var(--neu-bg);box-shadow:inset 0 0 0 1px var(--line-2)"></i>Netral <b>${s.netral}</b></span><span><i class="dot" style="background:var(--neg)"></i>Negatif <b>${s.negatif}</b></span></div>`;
+  function sbar(s, besar = false) {
+    const { pos, neg, tot, pp, pn } = persen(s);
+    if (!tot) return `<div class="sbar${besar ? " lg" : ""}"><i class="e" style="width:100%"></i></div>`;
+    return `<div class="sbar${besar ? " lg" : ""}">${pos ? `<i class="p" style="width:${pp}%" data-tip="Positif<br><b>${pp}%</b> · ${pos} berita"></i>` : ""}${neg ? `<i class="x" style="width:${pn}%" data-tip="Negatif<br><b>${pn}%</b> · ${neg} berita"></i>` : ""}</div>`;
+  }
+  const slegend = (s) => {
+    const { pos, neg, pp, pn } = persen(s);
+    return `<div class="slegend"><span><i class="dot" style="background:var(--pos)"></i>Positif <b>${pp}%</b> (${pos})</span><span><i class="dot" style="background:var(--neg)"></i>Negatif <b>${pn}%</b> (${neg})</span></div>`;
+  };
   const empty = (msg, icon = "search") => `<div class="empty">${ico(icon)}${esc(msg)}</div>`;
 
   // ---------- data ----------
@@ -120,10 +129,10 @@
   }
 
   function analisisLokal(items, topikId) {
-    const s = { positif: 0, netral: 0, negatif: 0 };
+    const s = { positif: 0, negatif: 0 };
     const tokoh = {};
     for (const it of items) {
-      s[it.sentimen] = (s[it.sentimen] || 0) + 1;
+      s[it.sentimen === "negatif" ? "negatif" : "positif"]++;
       for (const t of it.tokoh || []) tokoh[t] = (tokoh[t] || 0) + 1;
     }
     const top = (o, n) => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, n);
@@ -133,7 +142,7 @@
   // ---------- artikel ----------
   const artikelHTML = (it, showTopik) => `
     <article class="art">
-      <span class="rail ${it.sentimen}"></span>
+      <span class="rail ${it.sentimen === "negatif" ? "negatif" : "positif"}"></span>
       <div>
         <h3><a href="${esc(safeUrl(it.url))}" target="_blank" rel="noopener">${esc(it.judul)}</a></h3>
         <div class="meta">
@@ -247,12 +256,12 @@
         <label class="search">${ico("search")}<input class="input" id="fQ" placeholder="Cari judul atau media…" value="${esc(stBerita.q)}" /></label>
         <div class="seg seg-scroll" id="fHari">${RENTANG.map((r) => `<button data-h="${r.jam}" class="${r.jam === stBerita.jam ? "on" : ""}">${r.label}</button>`).join("")}</div>
         <select class="select" id="fSent">
-          <option value="semua">Semua sentimen</option><option value="positif">Positif</option><option value="netral">Netral</option><option value="negatif">Negatif</option>
+          <option value="semua">Semua sentimen</option><option value="positif">Positif</option><option value="negatif">Negatif</option>
         </select>
         <select class="select" id="fMedia"><option value="semua">Semua media</option></select>
       </div>
       <div id="bNotice"></div>
-      <div class="grid g-3" id="bKpi">${Array.from({ length: 3 }, () => `<div class="card kpi"><div class="skel" style="height:12px;width:50%"></div><div class="skel" style="height:28px;width:40%;margin-top:10px"></div></div>`).join("")}</div>
+      <div class="kpi-row" id="bKpi">${Array.from({ length: 2 }, () => `<div class="card kpi"><div class="skel" style="height:12px;width:50%"></div><div class="skel" style="height:28px;width:40%;margin-top:10px"></div></div>`).join("")}</div>
       ${t.id === "tmp" ? `<div class="card section-gap"><div class="card-head"><h2>Pengurus yang Disebut</h2><span class="muted">klik untuk menyaring</span></div><div class="card-pad" id="bTokoh"><div class="skel" style="height:60px"></div></div></div>` : ""}
       <div class="card section-gap">
         <div class="card-head"><h2>Daftar Berita</h2><span class="muted" id="bCount"></span></div>
@@ -293,7 +302,7 @@
   function filterBerita(items) {
     const q = stBerita.q.trim().toLowerCase();
     return items.filter((it) =>
-      (stBerita.sent === "semua" || it.sentimen === stBerita.sent) &&
+      (stBerita.sent === "semua" || (it.sentimen === "negatif" ? "negatif" : "positif") === stBerita.sent) &&
       (stBerita.media === "semua" || it.media === stBerita.media) &&
       (!stBerita.tokoh || (it.tokoh || []).includes(stBerita.tokoh)) &&
       (!q || `${it.judul} ${it.media}`.toLowerCase().includes(q)));
@@ -304,11 +313,16 @@
     const items = filterBerita(beritaData.artikel);
     const a = analisisLokal(items, t.id);
     const tot = items.length;
-    const pct = (v) => (tot ? Math.round((v / tot) * 100) : 0);
+    const ps = persen(a.s);
     $("#bKpi").innerHTML = `
       <div class="card kpi"><div class="lbl">${ico("news")}Total artikel</div><div class="val">${fmt.format(tot)}</div></div>
-      <div class="card kpi"><div class="lbl"><i class="dot" style="background:var(--pos)"></i>Positif</div><div class="val">${a.s.positif}<small>${pct(a.s.positif)}%</small></div></div>
-      <div class="card kpi"><div class="lbl"><i class="dot" style="background:var(--neg)"></i>Negatif</div><div class="val">${a.s.negatif}<small>${pct(a.s.negatif)}%</small></div></div>`;
+      <div class="card kpi kpi-sent">
+        <div class="sent-head">
+          <div><div class="lbl"><i class="dot" style="background:var(--pos)"></i>Positif</div><div class="val pos">${ps.pp}%<small>${ps.pos} berita</small></div></div>
+          <div style="text-align:right"><div class="lbl" style="justify-content:flex-end"><i class="dot" style="background:var(--neg)"></i>Negatif</div><div class="val neg">${ps.pn}%<small>${ps.neg} berita</small></div></div>
+        </div>
+        ${sbar(a.s, true)}
+      </div>`;
 
     const tk = $("#bTokoh");
     if (tk) {
