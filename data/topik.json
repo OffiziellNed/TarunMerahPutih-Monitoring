@@ -1,5 +1,5 @@
 {
-  "_catatan": "Daftar topik scraping berita. 'kueri' = kata kunci pencarian Google News. 'pakai_pengurus': true menambahkan nama dari data/pengurus.json. 'kecualikan' = kata yang dibuang (TMP = Taman Makam Pahlawan). 'kubu' = figur/organisasi pihak sendiri: berita NEGATIF hanya bila serangan mengarah KE kubu ini; bila kubu ini yang menyerang pihak lain, berita tidak dihitung negatif. 'sasaran' = nama tambahan khusus per topik.",
+  "_catatan": "Daftar topik scraping berita. 'kueri' = kata kunci pencarian Google News. 'pakai_pengurus': true menambahkan nama dari data/pengurus.json. 'kecualikan' = kata yang dibuang (TMP = Taman Makam Pahlawan). 'kubu' = figur/organisasi pihak sendiri: berita NEGATIF hanya bila serangan mengarah KE kubu ini; bila kubu ini yang menyerang pihak lain, berita tidak dihitung negatif. 'sasaran' = nama tambahan khusus per topik. Untuk topik selain TMP, berita hanya ditampilkan bila judulnya menyebut salah satu nama di 'sasaran' (supaya berita nyasar terbuang).",
   "kubu": [
     "PDIP",
     "PDI Perjuangan",
@@ -121,7 +121,7 @@
       ],
       "sasaran": [
         "Rio Dondokambey",
-        "Rio",
+        "Dondokambey",
         "Anak Olly"
       ]
     }
