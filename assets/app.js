@@ -3,12 +3,12 @@
   "use strict";
 
   const TOPIK = [
-    { id: "tmp", judul: "Berita Taruna Merah Putih", pendek: "Taruna Merah Putih", ikon: "news", desk: "Organisasi & seluruh jajaran pengurus pusat" },
-    { id: "pdip", judul: "PDI Perjuangan", pendek: "PDI Perjuangan", ikon: "flag", desk: "PDI Perjuangan · PDIP" },
-    { id: "megawati", judul: "Megawati Soekarnoputri", pendek: "Megawati", ikon: "user", desk: "Megawati Soekarnoputri · Ketum PDIP · Ketum PDI Perjuangan" },
-    { id: "puan", judul: "Puan Maharani", pendek: "Puan Maharani", ikon: "user", desk: "Puan Maharani · Ketua DPR RI" },
-    { id: "pinka", judul: "Pinka Haprani", pendek: "Pinka Haprani", ikon: "user", desk: "Diah Pikatan Hapsari · Pinka Haprani · Anak Puan" },
-    { id: "rio", judul: "Rio Dondokambey", pendek: "Rio Dondokambey", ikon: "user", desk: "Rio Dondokambey · Anak Olly Dondokambey" },
+    { id: "tmp", judul: "Berita Taruna Merah Putih", pendek: "Taruna Merah Putih", ikon: "news", desk: "Sayap Partai PDI Perjuangan" },
+    { id: "pdip", judul: "PDI Perjuangan", pendek: "PDI Perjuangan", ikon: "flag", desk: "Partai Politik" },
+    { id: "megawati", judul: "Megawati Soekarnoputri", pendek: "Megawati", ikon: "user", desk: "Ketua Umum PDI Perjuangan" },
+    { id: "puan", judul: "Puan Maharani", pendek: "Puan Maharani", ikon: "user", desk: "Ketua DPR" },
+    { id: "pinka", judul: "Pinka Haprani", pendek: "Pinka Haprani", ikon: "user", desk: "Ketua Umum Taruna Merah Putih" },
+    { id: "rio", judul: "Rio Dondokambey", pendek: "Rio Dondokambey", ikon: "user", desk: "Sekjen Taruna Merah Putih" },
   ];
 
   const $ = (s, el = document) => el.querySelector(s);
@@ -121,16 +121,13 @@
 
   function analisisLokal(items, topikId) {
     const s = { positif: 0, netral: 0, negatif: 0 };
-    const tokoh = {}, kata = {};
-    const STOP = new Set("dan di ke dari yang untuk dengan pada ini itu dalam akan jadi soal oleh atas tak tidak bisa ada usai kata sebut minta beri juga para jelang hingga agar sudah masih lebih baru kini saat terkait bagi pdip perjuangan".split(" "));
+    const tokoh = {};
     for (const it of items) {
       s[it.sentimen] = (s[it.sentimen] || 0) + 1;
       for (const t of it.tokoh || []) tokoh[t] = (tokoh[t] || 0) + 1;
-      for (const w of it.judul.toLowerCase().replace(/[^a-z0-9\s-]/g, " ").split(/\s+/))
-        if (w.length > 3 && !STOP.has(w) && !/^\d+$/.test(w)) kata[w] = (kata[w] || 0) + 1;
     }
     const top = (o, n) => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, n);
-    return { s, tokoh: topikId === "tmp" ? top(tokoh, 40) : [], kata: top(kata, 14) };
+    return { s, tokoh: topikId === "tmp" ? top(tokoh, 40) : [] };
   }
 
   // ---------- artikel ----------
@@ -255,14 +252,13 @@
         <select class="select" id="fMedia"><option value="semua">Semua media</option></select>
       </div>
       <div id="bNotice"></div>
-      <div class="grid g-4" id="bKpi">${Array.from({ length: 4 }, () => `<div class="card kpi"><div class="skel" style="height:12px;width:50%"></div><div class="skel" style="height:28px;width:40%;margin-top:10px"></div></div>`).join("")}</div>
+      <div class="grid g-3" id="bKpi">${Array.from({ length: 3 }, () => `<div class="card kpi"><div class="skel" style="height:12px;width:50%"></div><div class="skel" style="height:28px;width:40%;margin-top:10px"></div></div>`).join("")}</div>
       ${t.id === "tmp" ? `<div class="card section-gap"><div class="card-head"><h2>Pengurus yang Disebut</h2><span class="muted">klik untuk menyaring</span></div><div class="card-pad" id="bTokoh"><div class="skel" style="height:60px"></div></div></div>` : ""}
-      ${t.id !== "tmp" ? `<div class="card section-gap"><div class="card-head"><h2>Kata Kunci Dominan</h2><span class="muted">dari judul berita</span></div><div class="card-pad" id="bKata"><div class="skel" style="height:40px"></div></div></div>` : ""}
       <div class="card section-gap">
         <div class="card-head"><h2>Daftar Berita</h2><span class="muted" id="bCount"></span></div>
         <div class="articles" id="bList" style="margin-top:8px">${skeletonArt(6)}</div>
       </div>
-      <p class="small-note" style="padding:12px 4px">Sumber: Google News (Indonesia). Sentimen dihitung otomatis dari kata kunci judul, sifatnya indikatif.</p>`;
+      <p class="small-note" style="padding:12px 4px">Sumber: Google News (Indonesia). Berita dihitung negatif bila judulnya memuat serangan yang mengarah ke figur atau partai yang dipantau. Penilaian otomatis, sifatnya indikatif.</p>`;
 
     $("#fSent").value = stBerita.sent;
     $("#fQ").addEventListener("input", (e) => { stBerita.q = e.target.value; renderBerita(t); });
@@ -290,7 +286,7 @@
       btn.classList.remove("spin");
       beritaData = null;
       $("#bNotice").innerHTML = `<div class="notice">${ico("alert")}Gagal mengambil berita: ${esc(e.message)}</div>`;
-      ["#bKpi", "#bKata", "#bList", "#bTokoh"].forEach((s) => { const el = $(s); if (el) el.innerHTML = s === "#bKpi" ? "" : empty("Tidak ada data", "alert"); });
+      ["#bKpi", "#bList", "#bTokoh"].forEach((s) => { const el = $(s); if (el) el.innerHTML = s === "#bKpi" ? "" : empty("Tidak ada data", "alert"); });
     }
   }
 
@@ -311,11 +307,8 @@
     const pct = (v) => (tot ? Math.round((v / tot) * 100) : 0);
     $("#bKpi").innerHTML = `
       <div class="card kpi"><div class="lbl">${ico("news")}Total artikel</div><div class="val">${fmt.format(tot)}</div></div>
-      <div class="card kpi"><div class="lbl">${ico("eye")}Media unik</div><div class="val">${new Set(items.map((i) => i.media)).size}</div></div>
       <div class="card kpi"><div class="lbl"><i class="dot" style="background:var(--pos)"></i>Positif</div><div class="val">${a.s.positif}<small>${pct(a.s.positif)}%</small></div></div>
       <div class="card kpi"><div class="lbl"><i class="dot" style="background:var(--neg)"></i>Negatif</div><div class="val">${a.s.negatif}<small>${pct(a.s.negatif)}%</small></div></div>`;
-    if ($("#bKata")) $("#bKata").innerHTML = a.kata.length ? `<div class="chips">${a.kata.map(([w, n]) => `<button class="chip" data-kw="${esc(w)}">${esc(w)} <span class="c">${n}</span></button>`).join("")}</div>` : `<span class="muted">Belum ada data</span>`;
-    $$("#bKata [data-kw]").forEach((b) => b.addEventListener("click", () => { stBerita.q = b.dataset.kw; $("#fQ").value = stBerita.q; renderBerita(t); }));
 
     const tk = $("#bTokoh");
     if (tk) {
@@ -554,4 +547,3 @@
 
   route();
 })();
- 
