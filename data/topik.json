@@ -1,5 +1,5 @@
 {
-  "_catatan": "Daftar topik scraping berita. 'kueri' = kata kunci pencarian Google News (pakai tanda kutip untuk frasa persis, OR untuk alternatif). Topik dengan 'pakai_pengurus': true otomatis menambahkan semua nama dari data/pengurus.json. 'kecualikan' = kata yang dibuang dari hasil (mis. TMP = Taman Makam Pahlawan).",
+  "_catatan": "Daftar topik scraping berita. 'kueri' = kata kunci pencarian Google News (pakai tanda kutip untuk frasa persis, OR untuk alternatif). Topik dengan 'pakai_pengurus': true otomatis menambahkan semua nama dari data/pengurus.json. 'kecualikan' = kata yang dibuang dari hasil (mis. TMP = Taman Makam Pahlawan). 'sasaran' = nama figur/partai yang dipantau; berita dihitung NEGATIF bila ada serangan yang mengarah ke sasaran ini.",
   "topik": [
     {
       "id": "tmp",
@@ -21,6 +21,10 @@
         "pemakaman",
         "dimakamkan",
         "pahlawan"
+      ],
+      "sasaran": [
+        "Taruna Merah Putih",
+        "TMP"
       ]
     },
     {
@@ -30,6 +34,14 @@
       "kueri": [
         "\"PDI Perjuangan\"",
         "PDIP"
+      ],
+      "sasaran": [
+        "PDI Perjuangan",
+        "PDIP",
+        "PDI-P",
+        "Partai Banteng",
+        "Megawati",
+        "Puan"
       ]
     },
     {
@@ -41,6 +53,12 @@
         "\"Ketum PDIP\"",
         "\"Ketum PDI Perjuangan\"",
         "Megawati PDIP"
+      ],
+      "sasaran": [
+        "Megawati",
+        "Ketum PDIP",
+        "Ketum PDI Perjuangan",
+        "Bu Mega"
       ]
     },
     {
@@ -50,6 +68,10 @@
       "kueri": [
         "\"Puan Maharani\"",
         "\"Ketua DPR\" Puan"
+      ],
+      "sasaran": [
+        "Puan",
+        "Ketua DPR"
       ]
     },
     {
@@ -60,6 +82,11 @@
         "\"Diah Pikatan Hapsari\"",
         "\"Pinka Haprani\"",
         "\"Anak Puan\""
+      ],
+      "sasaran": [
+        "Pinka",
+        "Diah Pikatan",
+        "Anak Puan"
       ]
     },
     {
@@ -69,6 +96,11 @@
       "kueri": [
         "\"Rio Dondokambey\"",
         "\"Anak Olly Dondokambey\""
+      ],
+      "sasaran": [
+        "Rio Dondokambey",
+        "Rio",
+        "Anak Olly"
       ]
     }
   ]
