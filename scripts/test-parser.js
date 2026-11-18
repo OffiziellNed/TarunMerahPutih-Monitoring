@@ -1,0 +1,11 @@
+const assert = require("assert");
+const { parseRss, bangunKueri, TOPIK } = require("../lib/news");
+const xml = `<rss><channel><item><title>Judul &amp; Berita - Kompas.com</title><link>https://news.google.com/x</link><pubDate>Tue, 17 Nov 2026 03:00:00 GMT</pubDate><description>&lt;a&gt;Judul&lt;/a&gt;</description><source url="https://www.kompas.com">Kompas.com</source></item></channel></rss>`;
+const [it] = parseRss(xml);
+assert.equal(it.judul, "Judul & Berita");
+assert.equal(it.media, "Kompas.com");
+assert.equal(it.tanggal, "2026-11-17T03:00:00.000Z");
+const q = bangunKueri(TOPIK.topik[0]);
+assert.ok(q.length >= 8, "kueri pengurus terbentuk");
+q.forEach((s) => assert.ok(s.length < 400, "kueri tidak terlalu panjang: " + s.length));
+console.log("OK —", q.length, "kueri untuk topik TMP");

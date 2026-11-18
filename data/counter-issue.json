@@ -1,0 +1,40 @@
+[
+  {
+    "id": "contoh-isu-1",
+    "judul": "[CONTOH] Judul isu yang sedang beredar",
+    "tanggal": "2026-11-17",
+    "status": "Aktif",
+    "prioritas": "Tinggi",
+    "kategori": "Organisasi",
+    "platform": ["X / Twitter", "TikTok"],
+    "ringkasan": "Satu-dua kalimat ringkasan isu. Entri ini hanya contoh format — hapus atau ganti dengan isu nyata.",
+    "narasi_isu": "Tuliskan narasi/klaim yang beredar di publik apa adanya, beserta di mana pertama kali muncul.\n\nBisa beberapa paragraf. Mendukung **tebal**, *miring*, daftar dengan tanda `-`, dan [tautan](https://contoh.id).",
+    "kontra_narasi": "## Fakta\nTuliskan fakta dan data yang meluruskan isu.\n\n## Sikap Organisasi\nTuliskan sikap resmi organisasi.\n\n- Poin pendukung 1\n- Poin pendukung 2",
+    "poin_kunci": [
+      "Pesan kunci pertama yang siap disalin untuk caption/balasan.",
+      "Pesan kunci kedua.",
+      "Pesan kunci ketiga."
+    ],
+    "juru_bicara": ["Nama Juru Bicara"],
+    "referensi": [
+      { "judul": "Judul sumber/rujukan", "url": "https://contoh.id/artikel" }
+    ],
+    "tags": ["contoh"]
+  },
+  {
+    "id": "contoh-isu-2",
+    "judul": "[CONTOH] Isu yang sudah ditangani",
+    "tanggal": "2026-11-10",
+    "status": "Selesai",
+    "prioritas": "Sedang",
+    "kategori": "Kebijakan",
+    "platform": ["Instagram"],
+    "ringkasan": "Contoh isu berstatus selesai. Status yang tersedia: Aktif, Dipantau, Selesai. Prioritas: Tinggi, Sedang, Rendah.",
+    "narasi_isu": "Narasi isu.",
+    "kontra_narasi": "Kontra-narasi.",
+    "poin_kunci": ["Pesan kunci."],
+    "juru_bicara": [],
+    "referensi": [],
+    "tags": ["contoh"]
+  }
+]

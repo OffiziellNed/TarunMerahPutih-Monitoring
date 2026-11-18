@@ -1,0 +1,31 @@
+{
+  "_catatan": "Daftar topik scraping berita. 'kueri' = kata kunci pencarian Google News (pakai tanda kutip untuk frasa persis, OR untuk alternatif). Topik dengan 'pakai_pengurus': true otomatis menambahkan semua nama dari data/pengurus.json.",
+  "topik": [
+    {
+      "id": "tmp",
+      "judul": "Berita Taruna Merah Putih",
+      "deskripsi": "Pemberitaan organisasi dan seluruh jajaran pengurus pusat.",
+      "pakai_pengurus": true,
+      "konteks_pengurus": "(\"Taruna Merah Putih\" OR TMP OR PDIP OR \"PDI Perjuangan\")",
+      "kueri": ["\"Taruna Merah Putih\"", "\"TMP\" PDIP"]
+    },
+    {
+      "id": "megawati",
+      "judul": "Megawati Soekarnoputri",
+      "deskripsi": "Megawati Soekarnoputri, Ketum PDIP / Ketum PDI Perjuangan.",
+      "kueri": ["\"Megawati Soekarnoputri\"", "\"Ketum PDIP\"", "\"Ketum PDI Perjuangan\"", "Megawati PDIP"]
+    },
+    {
+      "id": "puan",
+      "judul": "Puan Maharani",
+      "deskripsi": "Puan Maharani, Ketua DPR RI.",
+      "kueri": ["\"Puan Maharani\"", "\"Ketua DPR\" Puan"]
+    },
+    {
+      "id": "pdip",
+      "judul": "PDI Perjuangan",
+      "deskripsi": "Pemberitaan PDI Perjuangan / PDIP.",
+      "kueri": ["\"PDI Perjuangan\"", "PDIP"]
+    }
+  ]
+}

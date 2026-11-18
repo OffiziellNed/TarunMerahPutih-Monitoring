@@ -1,0 +1,38 @@
+[
+  {
+    "id": "contoh-prestasi-1",
+    "judul": "[CONTOH] Nama program / kegiatan",
+    "tanggal": "2026-11-15",
+    "bidang": "Ekonomi Kreatif dan Ekonomi Digital",
+    "pelaksana": ["Ned Dean Barus"],
+    "lokasi": "Jakarta",
+    "ringkasan": "Ringkasan singkat capaian. Entri ini hanya contoh format — hapus atau ganti dengan kegiatan nyata.",
+    "sampul": "",
+    "capaian": [
+      { "label": "Peserta", "nilai": "0" },
+      { "label": "Kota", "nilai": "0" },
+      { "label": "Mitra", "nilai": "0" }
+    ],
+    "konten": "## Latar Belakang\nTuliskan latar belakang kegiatan.\n\n## Pelaksanaan\nTuliskan jalannya kegiatan.\n\n## Dampak\n- Dampak 1\n- Dampak 2",
+    "galeri": [],
+    "liputan": [
+      { "judul": "Judul liputan media", "url": "https://contoh.id/liputan" }
+    ],
+    "tags": ["contoh"]
+  },
+  {
+    "id": "contoh-prestasi-2",
+    "judul": "[CONTOH] Program kedua",
+    "tanggal": "2026-11-01",
+    "bidang": "Pemuda dan Olahraga",
+    "pelaksana": ["Andry Jonathan Sarlim"],
+    "lokasi": "Surabaya",
+    "ringkasan": "Contoh kedua. Isi 'sampul' dan 'galeri' dengan URL gambar atau path seperti /uploads/foto.jpg.",
+    "sampul": "",
+    "capaian": [{ "label": "Peserta", "nilai": "0" }],
+    "konten": "Isi detail kegiatan.",
+    "galeri": [],
+    "liputan": [],
+    "tags": ["contoh"]
+  }
+]
