@@ -147,6 +147,10 @@ h3 { font-size: 15px; margin: 0; font-weight: 700; }
 .link { color: var(--red); font-weight: 600; font-size: 13.5px; display: inline-flex; align-items: center; gap: 6px; }
 .link svg { width: 16px; height: 16px; }
 
+.dash-bar { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.dash-bar h2 { margin-bottom: 2px; }
+.dash-bar .muted { font-size: 13px; }
+.hero p b { color: #fff; }
 .topic-card { padding: 18px; display: flex; flex-direction: column; gap: 12px; transition: transform .15s, box-shadow .15s, border-color .15s; }
 .topic-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--line-2); }
 .topic-card .ic { width: 38px; height: 38px; border-radius: 11px; background: var(--red-50); color: var(--red); display: grid; place-items: center; }
