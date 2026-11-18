@@ -144,7 +144,7 @@
     return { s, media: top(media, 8), tokoh: topikId === "tmp" ? top(tokoh, 40) : [], kata: top(kata, 14), perHari: Object.entries(hariMap), perJam };
   }
 
-  // ---------- chart: artikel per hari ----------
+  // ---------- chart: artikel per hari / per jam ----------
   function chartHarian(perHari, perJam = false) {
     const W = 640, H = 190, pl = 28, pb = 24, pt = 10;
     const max = Math.max(4, ...perHari.map((d) => d[1]));
@@ -173,7 +173,7 @@
     });
     return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Jumlah artikel per ${perJam ? "jam" : "hari"}">${g}</svg>`;
   }
-  const hbars = (rows, onClick) => {
+  const hbars = (rows) => {
     if (!rows.length) return empty("Belum ada data");
     const max = rows[0][1];
     return `<div class="hbars">${rows.map(([n, v]) => `<div class="hbar"><span class="name">${esc(n)}</span><span class="v">${v}</span><div class="track"><div class="fill" style="width:${(v / max) * 100}%"></div></div></div>`).join("")}</div>`;
@@ -200,7 +200,7 @@
     const kol = ["tanggal", "judul", "media", "sentimen", "tokoh", "url"];
     const q = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
     const rows = [kol.join(","), ...items.map((it) => kol.map((k) => q(Array.isArray(it[k]) ? it[k].join("; ") : it[k])).join(","))];
-    const blob = new Blob(["﻿" + rows.join("\n")], { type: "text/csv;charset=utf-8" });
+    const blob = new Blob(["\ufeff" + rows.join("\n")], { type: "text/csv;charset=utf-8" });
     const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: `${nama}-${ymd(Date.now())}.csv` });
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
