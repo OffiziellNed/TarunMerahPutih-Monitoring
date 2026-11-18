@@ -1,14 +1,14 @@
-// GET /api/news?topik=tmp|megawati|puan|pdip&hari=7
+// GET /api/news?topik=tmp|pdip|megawati|puan&jam=168  (jam: 6, 12, 24, 72, 168, 336, 720)
 const { ambilBerita } = require("../lib/news");
 
 module.exports = async (req, res) => {
   const url = new URL(req.url, "http://x");
   const topik = url.searchParams.get("topik") || "tmp";
-  const hari = Math.min(Math.max(parseInt(url.searchParams.get("hari") || "7", 10) || 7, 1), 30);
+  const jam = Math.min(Math.max(parseInt(url.searchParams.get("jam") || "168", 10) || 168, 1), 720);
   try {
-    const data = await ambilBerita(topik, hari);
+    const data = await ambilBerita(topik, jam);
     // cache di edge Vercel 15 menit, boleh sajikan versi lama 1 jam sambil refresh
-    res.setHeader("Cache-Control", "public, s-maxage=900, stale-while-revalidate=3600");
+    res.setHeader("Cache-Control", `public, s-maxage=${jam <= 24 ? 300 : 900}, stale-while-revalidate=3600`);
     res.setHeader("Content-Type", "application/json; charset=utf-8");
     res.statusCode = 200;
     res.end(JSON.stringify(data));

@@ -4,9 +4,9 @@
 
   const TOPIK = [
     { id: "tmp", judul: "Berita Taruna Merah Putih", pendek: "Taruna Merah Putih", ikon: "news", desk: "Organisasi & seluruh jajaran pengurus pusat" },
+    { id: "pdip", judul: "PDI Perjuangan", pendek: "PDI Perjuangan", ikon: "flag", desk: "PDI Perjuangan · PDIP" },
     { id: "megawati", judul: "Megawati Soekarnoputri", pendek: "Megawati", ikon: "user", desk: "Megawati Soekarnoputri · Ketum PDIP · Ketum PDI Perjuangan" },
     { id: "puan", judul: "Puan Maharani", pendek: "Puan Maharani", ikon: "user", desk: "Puan Maharani · Ketua DPR RI" },
-    { id: "pdip", judul: "PDI Perjuangan", pendek: "PDI Perjuangan", ikon: "flag", desk: "PDI Perjuangan · PDIP" },
   ];
 
   const $ = (s, el = document) => el.querySelector(s);
@@ -29,6 +29,11 @@
     if (s < 86400 * 7) return `${Math.floor(s / 86400)} hari lalu`;
     return tglPendek(d);
   }
+  const RENTANG = [
+    { jam: 6, label: "6 jam" }, { jam: 12, label: "12 jam" }, { jam: 24, label: "24 jam" },
+    { jam: 72, label: "3 hari" }, { jam: 168, label: "7 hari" }, { jam: 336, label: "14 hari" }, { jam: 720, label: "30 hari" },
+  ];
+  const labelRentang = (jam) => (RENTANG.find((r) => r.jam === jam) || {}).label || `${jam} jam`;
   const ymd = (d) => {
     const x = new Date(d);
     return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}-${String(x.getDate()).padStart(2, "0")}`;
@@ -103,35 +108,44 @@
   const dataStatis = {};
   const loadData = (nama) => (dataStatis[nama] ||= getJSON(`/data/${nama}.json`).catch((e) => { delete dataStatis[nama]; throw e; }));
 
-  async function loadBerita(topik, hari, paksa = false) {
-    const key = `${topik}:${hari}`;
+  async function loadBerita(topik, jam, paksa = false) {
+    const key = `${topik}:${jam}`;
     const c = cache[key];
     if (!paksa && c && Date.now() - c.at < 5 * 60e3) return c.data;
-    const data = await getJSON(`/api/news?topik=${topik}&hari=${hari}${paksa ? `&_=${Date.now()}` : ""}`);
+    const data = await getJSON(`/api/news?topik=${topik}&jam=${jam}${paksa ? `&_=${Date.now()}` : ""}`);
     cache[key] = { at: Date.now(), data };
     return data;
   }
 
-  function analisisLokal(items, hari, topikId) {
+  function analisisLokal(items, jam, topikId) {
     const s = { positif: 0, netral: 0, negatif: 0 };
     const media = {}, tokoh = {}, kata = {};
     const STOP = new Set("dan di ke dari yang untuk dengan pada ini itu dalam akan jadi soal oleh atas tak tidak bisa ada usai kata sebut minta beri juga para jelang hingga agar sudah masih lebih baru kini saat terkait bagi pdip perjuangan".split(" "));
+    // jam <= 24: per jam; selebihnya per hari
+    const perJam = jam <= 24;
+    const kunciWaktu = (d) => {
+      const x = new Date(d);
+      if (!perJam) return ymd(x);
+      x.setMinutes(0, 0, 0);
+      return x.toISOString();
+    };
     const hariMap = {};
-    for (let i = hari - 1; i >= 0; i--) hariMap[ymd(Date.now() - i * 864e5)] = 0;
+    if (perJam) for (let i = jam - 1; i >= 0; i--) hariMap[kunciWaktu(Date.now() - i * 3600e3)] = 0;
+    else for (let i = Math.round(jam / 24) - 1; i >= 0; i--) hariMap[kunciWaktu(Date.now() - i * 864e5)] = 0;
     for (const it of items) {
       s[it.sentimen] = (s[it.sentimen] || 0) + 1;
       media[it.media] = (media[it.media] || 0) + 1;
       for (const t of it.tokoh || []) tokoh[t] = (tokoh[t] || 0) + 1;
-      if (it.tanggal) { const d = ymd(it.tanggal); if (d in hariMap) hariMap[d]++; }
+      if (it.tanggal) { const d = kunciWaktu(it.tanggal); if (d in hariMap) hariMap[d]++; }
       for (const w of it.judul.toLowerCase().replace(/[^a-z0-9\s-]/g, " ").split(/\s+/))
         if (w.length > 3 && !STOP.has(w) && !/^\d+$/.test(w)) kata[w] = (kata[w] || 0) + 1;
     }
     const top = (o, n) => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, n);
-    return { s, media: top(media, 8), tokoh: topikId === "tmp" ? top(tokoh, 40) : [], kata: top(kata, 14), perHari: Object.entries(hariMap) };
+    return { s, media: top(media, 8), tokoh: topikId === "tmp" ? top(tokoh, 40) : [], kata: top(kata, 14), perHari: Object.entries(hariMap), perJam };
   }
 
   // ---------- chart: artikel per hari ----------
-  function chartHarian(perHari) {
+  function chartHarian(perHari, perJam = false) {
     const W = 640, H = 190, pl = 28, pb = 24, pt = 10;
     const max = Math.max(4, ...perHari.map((d) => d[1]));
     const nice = Math.ceil(max / 4) * 4;
@@ -150,11 +164,14 @@
       const x = cx - bw / 2, top = y(v), base = y(0), h = base - top;
       const r = Math.min(4, h, bw / 2);
       const path = h > 0 ? `M${x},${base}V${top + r}Q${x},${top} ${x + r},${top}H${x + bw - r}Q${x + bw},${top} ${x + bw},${top + r}V${base}Z` : "";
-      const label = new Date(d).toLocaleDateString("id-ID", { weekday: "short", day: "numeric", month: "short" });
+      const label = perJam
+        ? new Date(d).toLocaleString("id-ID", { weekday: "short", hour: "2-digit", minute: "2-digit" })
+        : new Date(d).toLocaleDateString("id-ID", { weekday: "short", day: "numeric", month: "short" });
+      const tick = perJam ? new Date(d).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : tglPendek(d);
       g += `<g><rect class="hit" x="${pl + slot * i}" y="${pt}" width="${slot}" height="${H - pt}" data-tip="${label}<br><b>${v}</b> artikel"/>${path ? `<path class="bar" d="${path}" pointer-events="none"/>` : ""}</g>`;
-      if (i % step === 0 || i === n - 1) g += `<text class="ax" x="${cx}" y="${H - 6}" text-anchor="middle">${tglPendek(d)}</text>`;
+      if (i % step === 0 || i === n - 1) g += `<text class="ax" x="${cx}" y="${H - 6}" text-anchor="middle">${tick}</text>`;
     });
-    return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Jumlah artikel per hari">${g}</svg>`;
+    return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Jumlah artikel per ${perJam ? "jam" : "hari"}">${g}</svg>`;
   }
   const hbars = (rows, onClick) => {
     if (!rows.length) return empty("Belum ada data");
@@ -245,7 +262,7 @@
         <div><div class="t">${esc(x.judul)}</div><div class="m">${esc(x.bidang)} · ${tglPendek(x.tanggal)}</div></div></a>`).join("") : empty("Belum ada data");
     }).catch((e) => ($("#dPK").innerHTML = empty(e.message, "alert")));
 
-    const hasil = await Promise.allSettled(TOPIK.map((t) => loadBerita(t.id, 7)));
+    const hasil = await Promise.allSettled(TOPIK.map((t) => loadBerita(t.id, 168)));
     if (!view.isConnected || location.hash.replace(/^#/, "") !== "/" && location.hash !== "" && location.hash !== "#") return;
     const semua = [];
     hasil.forEach((h, i) => {
@@ -273,7 +290,7 @@
   // =====================================================================
   //  VIEW: BERITA
   // =====================================================================
-  const stBerita = { hari: 7, q: "", sent: "semua", media: "semua", tokoh: null };
+  const stBerita = { jam: 168, q: "", sent: "semua", media: "semua", tokoh: null };
   let beritaData = null;
 
   async function viewBerita(id, opt = {}) {
@@ -288,10 +305,9 @@
           <button class="btn btn-red" id="bRefresh">${ico("refresh")}Perbarui</button>
         </div>
       </div>
-      <nav class="tabs">${TOPIK.map((x) => `<a href="#/berita/${x.id}" class="${x.id === t.id ? "active" : ""}">${esc(x.pendek)}</a>`).join("")}</nav>
       <div class="toolbar">
         <label class="search">${ico("search")}<input class="input" id="fQ" placeholder="Cari judul atau media…" value="${esc(stBerita.q)}" /></label>
-        <div class="seg" id="fHari">${[1, 3, 7, 14, 30].map((h) => `<button data-h="${h}" class="${h === stBerita.hari ? "on" : ""}">${h === 1 ? "24 jam" : h + " hari"}</button>`).join("")}</div>
+        <div class="seg seg-scroll" id="fHari">${RENTANG.map((r) => `<button data-h="${r.jam}" class="${r.jam === stBerita.jam ? "on" : ""}">${r.label}</button>`).join("")}</div>
         <select class="select" id="fSent">
           <option value="semua">Semua sentimen</option><option value="positif">Positif</option><option value="netral">Netral</option><option value="negatif">Negatif</option>
         </select>
@@ -304,7 +320,7 @@
         <div class="card"><div class="card-head"><h2>Media Teratas</h2></div><div id="bMedia"><div style="padding:20px"><div class="skel" style="height:120px"></div></div></div></div>
       </div>
       ${t.id === "tmp" ? `<div class="card section-gap"><div class="card-head"><h2>Pengurus yang Disebut</h2><span class="muted">klik untuk menyaring</span></div><div class="card-pad" id="bTokoh"><div class="skel" style="height:60px"></div></div></div>` : ""}
-      <div class="card section-gap"><div class="card-head"><h2>Kata Kunci Dominan</h2><span class="muted">dari judul berita</span></div><div class="card-pad" id="bKata"><div class="skel" style="height:40px"></div></div></div>
+      ${t.id !== "tmp" ? `<div class="card section-gap"><div class="card-head"><h2>Kata Kunci Dominan</h2><span class="muted">dari judul berita</span></div><div class="card-pad" id="bKata"><div class="skel" style="height:40px"></div></div></div>` : ""}
       <div class="card section-gap">
         <div class="card-head"><h2>Daftar Berita</h2><span class="muted" id="bCount"></span></div>
         <div class="articles" id="bList" style="margin-top:8px">${skeletonArt(6)}</div>
@@ -317,15 +333,15 @@
     $("#fMedia").addEventListener("change", (e) => { stBerita.media = e.target.value; renderBerita(t); });
     $("#fHari").addEventListener("click", (e) => {
       const b = e.target.closest("button"); if (!b) return;
-      stBerita.hari = +b.dataset.h; viewBerita(t.id, { keep: true });
+      stBerita.jam = +b.dataset.h; viewBerita(t.id, { keep: true });
     });
-    $("#bRefresh").addEventListener("click", () => { delete cache[`${t.id}:${stBerita.hari}`]; viewBerita(t.id, { keep: true, force: true }); });
+    $("#bRefresh").addEventListener("click", () => { delete cache[`${t.id}:${stBerita.jam}`]; viewBerita(t.id, { keep: true, force: true }); });
     $("#bCsv").addEventListener("click", () => beritaData && csv(filterBerita(beritaData.artikel), `berita-${t.id}`));
 
     const btn = $("#bRefresh");
     btn.classList.add("spin");
     try {
-      beritaData = await loadBerita(t.id, stBerita.hari, paksa);
+      beritaData = await loadBerita(t.id, stBerita.jam, paksa);
       if (!location.hash.startsWith(`#/berita/${t.id}`)) return;
       btn.classList.remove("spin");
       const medias = [...new Set(beritaData.artikel.map((a) => a.media))].sort();
@@ -353,7 +369,7 @@
   function renderBerita(t) {
     if (!beritaData) return;
     const items = filterBerita(beritaData.artikel);
-    const a = analisisLokal(items, stBerita.hari, t.id);
+    const a = analisisLokal(items, stBerita.jam, t.id);
     const tot = items.length;
     const pct = (v) => (tot ? Math.round((v / tot) * 100) : 0);
     $("#bKpi").innerHTML = `
@@ -361,15 +377,15 @@
       <div class="card kpi"><div class="lbl">${ico("eye")}Media unik</div><div class="val">${new Set(items.map((i) => i.media)).size}</div></div>
       <div class="card kpi"><div class="lbl"><i class="dot" style="background:var(--pos)"></i>Positif</div><div class="val">${a.s.positif}<small>${pct(a.s.positif)}%</small></div></div>
       <div class="card kpi"><div class="lbl"><i class="dot" style="background:var(--neg)"></i>Negatif</div><div class="val">${a.s.negatif}<small>${pct(a.s.negatif)}%</small></div></div>`;
-    $("#bRange").textContent = `diperbarui ${relatif(beritaData.diperbarui)}`;
-    $("#bChart").innerHTML = chartHarian(a.perHari) + `<div style="margin-top:12px">${sbar(a.s)}<div style="margin-top:8px">${slegend(a.s)}</div></div>`;
+    $("#bRange").textContent = `${labelRentang(stBerita.jam)} terakhir · per ${a.perJam ? "jam" : "hari"} · diperbarui ${relatif(beritaData.diperbarui)}`;
+    $("#bChart").innerHTML = chartHarian(a.perHari, a.perJam) + `<div style="margin-top:12px">${sbar(a.s)}<div style="margin-top:8px">${slegend(a.s)}</div></div>`;
     $("#bMedia").innerHTML = hbars(a.media);
-    $("#bKata").innerHTML = a.kata.length ? `<div class="chips">${a.kata.map(([w, n]) => `<button class="chip" data-kw="${esc(w)}">${esc(w)} <span class="c">${n}</span></button>`).join("")}</div>` : `<span class="muted">Belum ada data</span>`;
+    if ($("#bKata")) $("#bKata").innerHTML = a.kata.length ? `<div class="chips">${a.kata.map(([w, n]) => `<button class="chip" data-kw="${esc(w)}">${esc(w)} <span class="c">${n}</span></button>`).join("")}</div>` : `<span class="muted">Belum ada data</span>`;
     $$("#bKata [data-kw]").forEach((b) => b.addEventListener("click", () => { stBerita.q = b.dataset.kw; $("#fQ").value = stBerita.q; renderBerita(t); }));
 
     const tk = $("#bTokoh");
     if (tk) {
-      const semuaTokoh = analisisLokal(beritaData.artikel, stBerita.hari, "tmp").tokoh;
+      const semuaTokoh = analisisLokal(beritaData.artikel, stBerita.jam, "tmp").tokoh;
       tk.innerHTML = semuaTokoh.length
         ? `<div class="chips">${stBerita.tokoh ? `<button class="chip" data-tk="">✕ Hapus filter</button>` : ""}${semuaTokoh.map(([n, c]) => `<button class="chip ${stBerita.tokoh === n ? "on" : ""}" data-tk="${esc(n)}">${esc(n)} <span class="c">${c}</span></button>`).join("")}</div>`
         : `<span class="muted">Belum ada pengurus yang disebut dalam rentang ini.</span>`;

@@ -13,7 +13,7 @@ Tanpa build step dan tanpa dependency. Cukup HTML/CSS/JS statis + 1 serverless f
 ```
 index.html              # aplikasi (SPA, routing pakai #)
 assets/                 # CSS, JS, logo (sudah dibersihkan dari ikon pojok)
-api/news.js             # GET /api/news?topik=tmp|megawati|puan|pdip&hari=7
+api/news.js             # GET /api/news?topik=tmp|pdip|megawati|puan&jam=168 (6, 12, 24, 72, 168, 336, 720)
 lib/news.js             # scraping Google News RSS + analisis
 data/pengurus.json      # nama pengurus pusat → otomatis jadi kata kunci scraping
 data/topik.json         # kata kunci untuk 4 kanal berita

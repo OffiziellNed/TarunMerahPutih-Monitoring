@@ -20,7 +20,7 @@ function mockRss(url) {
     const nama = pool[Math.floor(rnd() * pool.length)];
     const media = MEDIA[Math.floor(rnd() * MEDIA.length)];
     const judul = POLA[Math.floor(rnd() * POLA.length)].replace("{n}", nama);
-    const d = new Date(Date.now() - rnd() * 6.5 * 864e5).toUTCString();
+    const d = new Date(Date.now() - rnd() ** 2 * 6.5 * 864e5).toUTCString();
     items += `<item><title>${judul} - ${media}</title><link>https://news.google.com/rss/articles/mock${i}${seed}</link><pubDate>${d}</pubDate><description>&lt;a href="#"&gt;${judul}&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color="#6f6f6f"&gt;${media}&lt;/font&gt;</description><source url="https://${media.toLowerCase()}">${media}</source></item>`;
   }
   return `<?xml version="1.0"?><rss><channel>${items}</channel></rss>`;
