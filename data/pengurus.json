@@ -1,38 +1,155 @@
 {
+  "_catatan": "'kata_kunci' = nama lain yang dipakai media. 'kecualikan' = bila berita memuat kata ini, nama tsb dianggap orang lain (bukan pengurus).",
   "organisasi": "Taruna Merah Putih",
-  "alias": ["Taruna Merah Putih", "TMP"],
+  "alias": [
+    "Taruna Merah Putih",
+    "TMP"
+  ],
   "pengurus": [
-    { "nama": "Diah Pikatan O. P. Hapsari", "jabatan": "Ketua Umum", "kata_kunci": ["Diah Pikatan", "Diah Pikatan Orissa Putri Hapsari", "Pinka Haprani"] },
-
-    { "nama": "Nico Siahaan", "jabatan": "Ketua Bidang Kehormatan Partai" },
-    { "nama": "Yohanis Fransiskus Lema", "jabatan": "Ketua Bidang Pemenangan Pemilu dan Sumberdaya", "kata_kunci": ["Yohanis Fransiskus Lema", "Ansy Lema"] },
-    { "nama": "Sigit Widiarto", "jabatan": "Ketua Bidang Ideologi dan Kaderisasi" },
-    { "nama": "Patria Pinandita Ginting Suka", "jabatan": "Ketua Bidang Keanggotaan dan Organisasi" },
-    { "nama": "Kaisar Kiasa Kasih Said Putra", "jabatan": "Ketua Bidang Politik" },
-    { "nama": "Aris Setiawan Yodi", "jabatan": "Ketua Bidang Kebijakan Publik dan Pemerintahan" },
-    { "nama": "Irine Yusiana Roba Putri", "jabatan": "Ketua Bidang Luar Negeri", "kata_kunci": ["Irine Yusiana Roba Putri", "Irine Roba Putri"] },
-    { "nama": "Putu Bravo Timothy", "jabatan": "Ketua Bidang Reformasi Hukum dan HAM" },
-    { "nama": "Yolanda Tamara", "jabatan": "Ketua Bidang Perekonomian" },
-    { "nama": "Angelina Dewi Laksana Putri", "jabatan": "Ketua Bidang Pendidikan dan Kebudayaan" },
-    { "nama": "Riezky Aprilia", "jabatan": "Ketua Bidang Pariwisata" },
-    { "nama": "Dikson Siringoringo", "jabatan": "Ketua Bidang Penanggulangan Bencana" },
-    { "nama": "Yusuf Wuisan", "jabatan": "Ketua Bidang Industri dan Perdagangan" },
-    { "nama": "Patricia Atma Novera Hutapea", "jabatan": "Ketua Bidang Kesehatan" },
-    { "nama": "Mangatta Toding Allo", "jabatan": "Ketua Bidang Jaminan Sosial dan Tenaga Kerja" },
-    { "nama": "Patricia Arstuti", "jabatan": "Ketua Bidang Perempuan dan Anak" },
-    { "nama": "Nila Yani Hardiyanti", "jabatan": "Ketua Bidang Koperasi dan UMKM" },
-    { "nama": "Andry Jonathan Sarlim", "jabatan": "Ketua Bidang Pemuda dan Olahraga" },
-    { "nama": "Muhammad Abdul Azis Sefudin", "jabatan": "Ketua Bidang Keagamaan & Kepercayaan kepada Tuhan Yang Maha Esa" },
-    { "nama": "Ned Dean Barus", "jabatan": "Ketua Bidang Ekonomi Kreatif dan Ekonomi Digital" },
-    { "nama": "Ahmad Rizal", "jabatan": "Ketua Bidang Pertanian dan Pangan" },
-    { "nama": "Alam Panjaitan", "jabatan": "Ketua Bidang Advokasi Hukum" },
-    { "nama": "Octavianus Elnandus Kandouw", "jabatan": "Ketua Bidang Kelautan dan Perikanan" },
-    { "nama": "Pangeran Siahaan", "jabatan": "Ketua Bidang Kehutanan dan Lingkungan Hidup" },
-
-    { "nama": "Rio A. J. Dondokambey", "jabatan": "Sekretaris Jenderal", "kata_kunci": ["Rio Dondokambey", "Rio A. J. Dondokambey", "Rio AJ Dondokambey"] },
-    { "nama": "Akhmad Meidy Fahmaridho", "jabatan": "Wakil Sekretaris Jenderal Bidang Internal" },
-    { "nama": "Melki Sedek", "jabatan": "Wakil Sekretaris Jenderal Bidang Eksternal", "kata_kunci": ["Melki Sedek", "Melki Sedek Huang"] },
-    { "nama": "Stephanie Octavia", "jabatan": "Bendahara Umum" },
-    { "nama": "Marscia Andriani", "jabatan": "Wakil Bendahara Umum" }
+    {
+      "nama": "Diah Pikatan O. P. Hapsari",
+      "jabatan": "Ketua Umum",
+      "kata_kunci": [
+        "Diah Pikatan",
+        "Diah Pikatan Orissa Putri Hapsari",
+        "Pinka Haprani"
+      ]
+    },
+    {
+      "nama": "Nico Siahaan",
+      "jabatan": "Ketua Bidang Kehormatan Partai"
+    },
+    {
+      "nama": "Yohanis Fransiskus Lema",
+      "jabatan": "Ketua Bidang Pemenangan Pemilu dan Sumberdaya",
+      "kata_kunci": [
+        "Yohanis Fransiskus Lema",
+        "Ansy Lema"
+      ]
+    },
+    {
+      "nama": "Sigit Widiarto",
+      "jabatan": "Ketua Bidang Ideologi dan Kaderisasi"
+    },
+    {
+      "nama": "Patria Pinandita Ginting Suka",
+      "jabatan": "Ketua Bidang Keanggotaan dan Organisasi"
+    },
+    {
+      "nama": "Kaisar Kiasa Kasih Said Putra",
+      "jabatan": "Ketua Bidang Politik"
+    },
+    {
+      "nama": "Aris Setiawan Yodi",
+      "jabatan": "Ketua Bidang Kebijakan Publik dan Pemerintahan"
+    },
+    {
+      "nama": "Irine Yusiana Roba Putri",
+      "jabatan": "Ketua Bidang Luar Negeri",
+      "kata_kunci": [
+        "Irine Yusiana Roba Putri",
+        "Irine Roba Putri"
+      ]
+    },
+    {
+      "nama": "Putu Bravo Timothy",
+      "jabatan": "Ketua Bidang Reformasi Hukum dan HAM"
+    },
+    {
+      "nama": "Yolanda Tamara",
+      "jabatan": "Ketua Bidang Perekonomian"
+    },
+    {
+      "nama": "Angelina Dewi Laksana Putri",
+      "jabatan": "Ketua Bidang Pendidikan dan Kebudayaan"
+    },
+    {
+      "nama": "Riezky Aprilia",
+      "jabatan": "Ketua Bidang Pariwisata"
+    },
+    {
+      "nama": "Dikson Siringoringo",
+      "jabatan": "Ketua Bidang Penanggulangan Bencana"
+    },
+    {
+      "nama": "Yusuf Wuisan",
+      "jabatan": "Ketua Bidang Industri dan Perdagangan"
+    },
+    {
+      "nama": "Patricia Atma Novera Hutapea",
+      "jabatan": "Ketua Bidang Kesehatan"
+    },
+    {
+      "nama": "Mangatta Toding Allo",
+      "jabatan": "Ketua Bidang Jaminan Sosial dan Tenaga Kerja"
+    },
+    {
+      "nama": "Patricia Arstuti",
+      "jabatan": "Ketua Bidang Perempuan dan Anak"
+    },
+    {
+      "nama": "Nila Yani Hardiyanti",
+      "jabatan": "Ketua Bidang Koperasi dan UMKM"
+    },
+    {
+      "nama": "Andry Jonathan Sarlim",
+      "jabatan": "Ketua Bidang Pemuda dan Olahraga"
+    },
+    {
+      "nama": "Muhammad Abdul Azis Sefudin",
+      "jabatan": "Ketua Bidang Keagamaan & Kepercayaan kepada Tuhan Yang Maha Esa"
+    },
+    {
+      "nama": "Ned Dean Barus",
+      "jabatan": "Ketua Bidang Ekonomi Kreatif dan Ekonomi Digital"
+    },
+    {
+      "nama": "Ahmad Rizal",
+      "jabatan": "Ketua Bidang Pertanian dan Pangan",
+      "kecualikan": [
+        "Bulog"
+      ]
+    },
+    {
+      "nama": "Alam Panjaitan",
+      "jabatan": "Ketua Bidang Advokasi Hukum"
+    },
+    {
+      "nama": "Octavianus Elnandus Kandouw",
+      "jabatan": "Ketua Bidang Kelautan dan Perikanan"
+    },
+    {
+      "nama": "Pangeran Siahaan",
+      "jabatan": "Ketua Bidang Kehutanan dan Lingkungan Hidup"
+    },
+    {
+      "nama": "Rio A. J. Dondokambey",
+      "jabatan": "Sekretaris Jenderal",
+      "kata_kunci": [
+        "Rio Dondokambey",
+        "Rio A. J. Dondokambey",
+        "Rio AJ Dondokambey"
+      ]
+    },
+    {
+      "nama": "Akhmad Meidy Fahmaridho",
+      "jabatan": "Wakil Sekretaris Jenderal Bidang Internal"
+    },
+    {
+      "nama": "Melki Sedek",
+      "jabatan": "Wakil Sekretaris Jenderal Bidang Eksternal",
+      "kata_kunci": [
+        "Melki Sedek",
+        "Melki Sedek Huang"
+      ]
+    },
+    {
+      "nama": "Stephanie Octavia",
+      "jabatan": "Bendahara Umum"
+    },
+    {
+      "nama": "Marscia Andriani",
+      "jabatan": "Wakil Bendahara Umum"
+    }
   ]
 }
